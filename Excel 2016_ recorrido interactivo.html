@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Excel 2016: recorrido interactivo</title>
+<style>
+:root{--bg:#eef0ee;--pn:#fff;--tx:#222;--mu:#666;--bd:#cfcfcf;--gr:#217346;--rb:#f6f6f6;--hl:#fff1bd;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161816;--pn:#242624;--tx:#eee;--mu:#aaa;--bd:#474a47;--rb:#2c2e2c;--hl:#4d4520}}
+:root[data-theme="dark"]{--bg:#161816;--pn:#242624;--tx:#eee;--mu:#aaa;--bd:#474a47;--rb:#2c2e2c;--hl:#4d4520}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;padding:12px;background:var(--bg);color:var(--tx);font:14px/1.45 "Segoe UI",system-ui,Arial,sans-serif}
+h1{font-size:19px;margin:0 0 2px}.sub{color:var(--mu);margin:0 0 10px;font-size:13px}
+.chip{display:inline-block;background:var(--gr);color:#fff;border-radius:10px;padding:1px 9px;font-size:12px;margin-left:6px}
+.app{max-width:980px;border:1px solid var(--bd);background:var(--pn);border-radius:6px;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:1px solid transparent;cursor:pointer}
+.bar{background:var(--gr);color:#fff;display:flex;align-items:center;gap:6px;padding:3px 8px;flex-wrap:wrap}
+.bar button{color:#fff;padding:1px 7px;border-radius:3px}.bar button:hover{background:rgba(255,255,255,.2)}
+.srch{margin-left:auto;background:rgba(255,255,255,.18)!important;font-size:12px}
+.tabs{background:var(--gr);display:flex;overflow-x:auto;padding:0 6px}
+.tabs button{color:#fff;padding:5px 12px;font-size:13px;border-radius:3px 3px 0 0;white-space:nowrap}
+.tabs button.on{background:var(--rb);color:var(--gr);font-weight:600}
+.rib{display:flex;background:var(--rb);border-bottom:1px solid var(--bd);padding:4px;overflow-x:auto;min-height:92px}
+.g{display:flex;flex-direction:column;border-right:1px solid var(--bd);padding:0 4px;flex:none}
+.gb{display:grid;grid-template-rows:repeat(2,auto);grid-auto-flow:column;gap:1px;flex:1}
+.gl{font-size:10px;color:var(--mu);text-align:center;margin-top:2px}
+.b{min-width:58px;padding:3px 4px;border-radius:3px;display:flex;flex-direction:column;align-items:center;gap:1px}
+.b.t{grid-row:span 2;justify-content:center}.b .i{font-size:16px;line-height:19px}.b .l{font-size:10px;line-height:11px;text-align:center}
+.b:hover,.tabs button:hover:not(.on){background:var(--hl);color:var(--tx)}
+.note{padding:14px;color:var(--mu);align-self:center}
+.fb{display:flex;border-bottom:1px solid var(--bd);align-items:stretch}
+.fb button{padding:2px 8px;border-right:1px solid var(--bd);font-size:13px}.nb{width:72px;text-align:left}.fi{flex:1;text-align:left;font-family:Calibri,sans-serif}
+.gw{overflow-x:auto}table{border-collapse:collapse;font:12px Calibri,"Segoe UI",sans-serif;width:100%}
+th,td{border:1px solid var(--bd);height:21px;min-width:74px;padding:0 4px}th{background:var(--rb);font-weight:400;color:var(--mu);cursor:pointer}
+th.r{min-width:30px;width:30px}td{cursor:cell}td.n{text-align:right}td.cs{outline:2px solid var(--gr);outline-offset:-2px}
+.sb{display:flex;align-items:center;gap:8px;background:var(--rb);border-top:1px solid var(--bd);padding:2px 6px;font-size:12px}
+.sb .sp{flex:1}.sb button{padding:0 6px}.sh{background:var(--pn);color:var(--gr);font-weight:600;border-bottom:2px solid var(--gr)!important}
+.sel{outline:2px solid #e8a200!important;outline-offset:-2px;background:var(--hl)!important;color:var(--tx)!important}
+.panel{max-width:980px;margin-top:10px;background:var(--pn);border:1px solid var(--bd);border-left:5px solid var(--gr);border-radius:6px;padding:12px 14px;display:flex;gap:12px;min-height:96px}
+.pi{font-size:30px;min-width:42px;text-align:center}.pl{font-size:17px;font-weight:600}.pw{font-size:12px;color:var(--mu);margin:1px 0 6px}
+.pt{margin-top:6px;font-size:13px;background:var(--rb);border-radius:4px;padding:4px 8px;display:inline-block}
+</style></head><body>
+<h1>Excel 2016: recorrido interactivo <span class="chip">Versión completa</span></h1>
+<p class="sub">Haz clic en cualquier pestaña, botón o parte de la pantalla y abajo aparece qué es y qué hace.</p>
+<div class="app" id="app"></div>
+<div class="panel"><div class="pi" id="pi">👆</div><div><div class="pl" id="pl">¡Empieza aquí!</div><div class="pw" id="pw">Prueba con la pestaña Inicio</div><div id="pd">Toca cualquier botón de la cinta de opciones, la barra de fórmulas, las celdas o las pestañas de abajo. Prueba la pestaña Fórmulas para ver cómo sumar, restar, multiplicar y dividir.</div><div class="pt" id="pt" style="display:none"></div></div></div>
+<script>
+const D={};
+const reg=(k,w,i,l,d,t)=>D[k]={w,i,l,d,t};
+// Interfaz general: [id, dónde, icono, nombre, descripción, dato]
+[['save','Barra de acceso rápido','💾','Guardar','Guarda el libro en el que trabajas.','Atajo: Ctrl+G'],
+['undo','Barra de acceso rápido','↶','Deshacer','Revierte la última acción que hiciste.','Atajo: Ctrl+Z'],
+['redo','Barra de acceso rápido','↷','Rehacer','Vuelve a aplicar lo que acabas de deshacer.','Atajo: Ctrl+Y'],
+['title','Parte superior','🏷️','Barra de título','Muestra el nombre del libro (Libro1 mientras no lo guardes) y el nombre del programa.'],
+['search','Parte superior','💡','Dime qué desea hacer','Cuadro de ayuda de Excel 2016: escribes lo que quieres hacer y te lleva a esa herramienta.','Prueba escribir “bordes”'],
+['namebox','Debajo de la cinta, a la izquierda','🔠','Cuadro de nombres','Muestra la dirección de la celda seleccionada (por ejemplo B3). También puedes escribir una dirección para ir directo a ella.','Dirección = letra de columna + número de fila'],
+['fx','Barra de fórmulas','ƒx','Insertar función','Abre el asistente para elegir una función (SUMA, PROMEDIO, SI…) y llenar sus datos.','Atajo: Mayús+F3'],
+['fbar','Debajo de la cinta','✏️','Barra de fórmulas','Muestra y permite editar el contenido real de la celda: texto, número o fórmula.','Atajo para editar: F2'],
+['colh','Parte superior de la cuadrícula','🔤','Encabezados de columna','Letras (A, B, C…) que identifican cada columna. Un clic selecciona toda la columna.','Una hoja llega hasta la columna XFD (16,384 columnas)'],
+['rowh','Lado izquierdo de la cuadrícula','🔢','Encabezados de fila','Números que identifican cada fila. Un clic selecciona toda la fila.','Una hoja tiene 1,048,576 filas'],
+['sheet','Parte inferior','📑','Pestaña de hoja','Cada libro puede tener varias hojas. Con clic derecho puedes renombrar, mover, copiar o cambiar su color.','Doble clic para renombrarla'],
+['addsheet','Parte inferior','⊕','Nueva hoja','Agrega una hoja nueva al libro.','Atajo: Mayús+F11'],
+['status','Parte inferior','ℹ️','Barra de estado','Muestra el estado (Listo, Modo Editar…) y, al seleccionar números, su promedio, recuento y suma.'],
+['views','Barra de estado, a la derecha','🖥️','Vistas del libro','Cambian entre Normal, Diseño de página y Vista previa de salto de página.'],
+['zoom','Barra de estado, a la derecha','🔎','Zoom','Acerca o aleja la hoja con la barra deslizante.','Ctrl + rueda del mouse']
+].forEach(a=>reg(...a));
+// Pestañas
+const TABS=[['Archivo',0,'Menú con lo que se hace al libro completo: Nuevo, Abrir, Guardar como, Imprimir, Compartir y Opciones.','Atajo para imprimir: Ctrl+P'],
+['Inicio',0,'Las herramientas más usadas: copiar y pegar, formato de texto y números, insertar celdas, ordenar y filtrar.'],
+['Insertar',2,'Agrega objetos a la hoja: tablas, gráficos, imágenes, formas y símbolos.'],
+['Diseño de página',3,'Controla cómo se ve la hoja al imprimirla: márgenes, orientación, tamaño y área de impresión.'],
+['Fórmulas',4,'Biblioteca de funciones (SUMA, SI, BUSCARV…), nombres definidos y herramientas para revisar fórmulas.'],
+['Datos',5,'Importar datos y trabajar con ellos: ordenar, filtrar, quitar duplicados y validación de datos.'],
+['Revisar',6,'Ortografía, comentarios y protección de hojas y libros.'],
+['Vista',7,'Cambia cómo ves el libro: zoom, inmovilizar paneles, cuadrícula y ventanas.']];
+TABS.forEach(t=>reg('tab-'+t[0],'Cinta de opciones','📂','Pestaña '+t[0],t[2],t[3]));
+// Inicio: [grupo, [icono, nombre, descripción, dato]]
+const INI=[['Portapapeles',[['📋','Pegar','Coloca lo que copiaste o cortaste. Su menú permite pegar solo valores o solo el formato.','Atajo: Ctrl+V'],['✂️','Cortar','Quita lo seleccionado y lo guarda para pegarlo en otro lugar.','Atajo: Ctrl+X'],['📄','Copiar','Duplica lo seleccionado sin quitarlo de su lugar.','Atajo: Ctrl+C'],['🖌️','Copiar formato','Copia solo el aspecto (color, letra, bordes) de una celda y lo pasa a otra.','Doble clic en la brocha para usarla varias veces']]],
+['Fuente',[['Aa','Fuente','Cambia el tipo de letra (Calibri, Arial…).','Excel 2016 usa Calibri por defecto'],['11','Tamaño de fuente','Define el tamaño de la letra en puntos.','Por defecto: 11'],['<b>N</b>','Negrita','Pone el texto más grueso para resaltarlo.','Atajo: Ctrl+N'],['<i>K</i>','Cursiva','Inclina el texto.','Atajo: Ctrl+K'],['<u>S</u>','Subrayado','Subraya el texto.','Atajo: Ctrl+S'],['▦','Bordes','Dibuja líneas alrededor o dentro de las celdas, como una tabla.','Ejemplo: “Todos los bordes” a una lista'],['🪣','Color de relleno','Pinta el fondo de las celdas.','Ejemplo: encabezados en verde'],['<b style="color:#d00">A</b>','Color de fuente','Cambia el color de las letras.','Ejemplo: números negativos en rojo']]],
+['Alineación',[['⤒','Alinear en la parte superior','Pega el contenido al borde de arriba de la celda.'],['↕','Alinear en el medio','Centra el contenido de arriba a abajo.'],['⤓','Alinear en la parte inferior','Pega el contenido al borde de abajo (es lo normal).'],['⬅','Alinear a la izquierda','Acomoda el contenido a la izquierda.','El texto va a la izquierda por defecto'],['↔','Centrar','Centra el contenido de izquierda a derecha.'],['➡','Alinear a la derecha','Acomoda el contenido a la derecha.','Los números van a la derecha por defecto'],['↗','Orientación','Gira el texto: diagonal, vertical…','Ideal para encabezados angostos'],['↵','Ajustar texto','Baja el texto a otro renglón dentro de la misma celda en vez de salirse.','Ajusta la altura de la fila automáticamente'],['⊞','Combinar y centrar','Une varias celdas en una sola y centra el contenido.','Ejemplo: un título sobre A1:D1']]],
+['Número',[['123','Formato de número','Elige cómo se muestra un dato: General, Número, Moneda, Fecha, Hora, Porcentaje, Texto…','Cambia la apariencia, no el valor'],['$','Formato de número de contabilidad','Agrega el símbolo de moneda y dos decimales.','Ejemplo: 1500 → $1,500.00'],['%','Estilo porcentual','Multiplica por 100 y agrega el símbolo %.','Ejemplo: 0.25 → 25%'],['000','Estilo millares','Agrega la coma separadora de miles.'],['.0→','Aumentar decimales','Muestra un decimal más.'],['←.0','Disminuir decimales','Muestra un decimal menos.']]],
+['Estilos',[['🎨','Formato condicional','Colorea celdas automáticamente según una regla.','Ejemplo: calificaciones menores a 6 en rojo'],['📊','Dar formato como tabla','Convierte un rango en tabla con diseño, filtros y filas alternadas.','Atajo: Ctrl+T'],['🏷️','Estilos de celda','Aplica formatos ya hechos: Título, Bueno, Malo, Neutral…']]],
+['Celdas',[['➕','Insertar','Agrega celdas, filas, columnas u hojas.'],['➖','Eliminar','Quita celdas, filas, columnas u hojas; las demás se recorren.','Distinto de Borrar, que solo limpia'],['📐','Formato','Cambia alto de fila y ancho de columna; oculta, renombra o protege hojas.','Doble clic en el borde de una columna la autoajusta']]],
+['Modificar',[['Σ','Autosuma','Suma un rango automáticamente. Su menú también da Promedio, Contar números, Máx y Mín.','Atajo: Alt+='],['⬇','Rellenar','Copia datos o series hacia abajo, derecha, arriba o izquierda.','También puedes arrastrar el cuadro de relleno'],['🧹','Borrar','Quita el contenido, el formato, los comentarios o todo.','La tecla Suprimir borra solo el contenido'],['⇅','Ordenar y filtrar','Ordena (A a Z, menor a mayor) o activa filtros para ver solo lo que cumple un criterio.','Filtros: Ctrl+Mayús+L'],['🔍','Buscar y seleccionar','Encuentra y reemplaza texto o valores, o selecciona celdas con fórmulas, comentarios, etc.','Ctrl+B buscar · Ctrl+L reemplazar']]]];
+let n=0;
+const build=(tab,G)=>G.map(g=>'<div class="g"><div class="gb">'+g[1].map((b,j)=>{const k='b'+(n++);reg(k,'Pestaña '+tab+' › grupo '+g[0],b[0],b[1],b[2],b[3]);
+return '<button class="b'+(g[0]=='Portapapeles'&&j==0?' t':'')+'" data-k="'+k+'"><span class="i">'+b[0]+'</span><span class="l">'+(b[4]||b[1]).replace('Alinear en la parte ','').replace('Alinear a la ','').replace('Formato de número de contabilidad','Contabilidad')+'</span></button>'}).join('')+'</div><div class="gl">'+g[0]+'</div></div>').join('');
+const ribbon=build('Inicio',INI);
+const MORE={
+Insertar:[['Tablas',[['🧮','Tabla dinámica','Resume y analiza muchos datos arrastrando campos, sin escribir fórmulas.','Ejemplo: promedio por grupo'],['📊','Tablas dinámicas recomendadas','Excel sugiere tablas dinámicas según tus datos.','','Tablas recom.'],['▤','Tabla','Convierte el rango en tabla con filtros y formato.','Atajo: Ctrl+T']]],
+['Ilustraciones',[['🖼️','Imágenes','Inserta una foto guardada en tu computadora.'],['🌐','Imágenes en línea','Busca e inserta imágenes de internet.'],['⬟','Formas','Dibuja flechas, rectángulos, círculos y más.'],['🔗','SmartArt','Crea diagramas listos: procesos, jerarquías, ciclos.'],['📸','Captura','Inserta una captura de otra ventana abierta.']]],
+['Gráficos',[['👍','Gráficos recomendados','Excel sugiere el gráfico que mejor muestra tus datos.','','Recomend.'],['📊','Columnas','Barras verticales para comparar valores.','Ejemplo: calificaciones por alumno'],['📈','Línea','Muestra cambios a lo largo del tiempo.'],['🥧','Circular','Muestra las partes de un total.'],['📉','Gráfico dinámico','Gráfico conectado a una tabla dinámica.']]],
+['Minigráficos',[['〰️','Minigráficos','Gráficos diminutos dentro de una sola celda.','Tipos: línea, columna, ganancia o pérdida']]],
+['Filtros',[['🎚️','Segmentación de datos','Botones visuales para filtrar tablas.','','Segmentación']]],
+['Vínculos',[['🔗','Hipervínculo','Enlaza una celda con una página web, otro archivo o una hoja.']]],
+['Texto',[['🔤','Cuadro de texto','Texto flotante que puedes mover por la hoja.'],['📄','Encabezado y pie de página','Texto fijo arriba o abajo de cada hoja impresa: número de página, fecha…','','Encab. y pie']]],
+['Símbolos',[['π','Ecuación','Inserta ecuaciones matemáticas.'],['Ω','Símbolo','Inserta caracteres especiales: ©, €, ±…']]]],
+'Diseño de página':[['Temas',[['🎨','Temas','Cambia colores, fuentes y efectos de todo el libro a la vez.']]],
+['Configurar página',[['⬚','Márgenes','Espacio en blanco entre el borde de la hoja y los datos al imprimir.'],['🔄','Orientación','Vertical u horizontal.','Horizontal si la tabla es muy ancha'],['📏','Tamaño','Tamaño del papel: Carta, Oficio, A4…','En México se usa Carta'],['🖨️','Área de impresión','Elige solo el rango que se imprimirá.','','Área impr.'],['↧','Saltos','Indica dónde empieza una página nueva.'],['🏷️','Imprimir títulos','Repite filas o columnas (como los encabezados) en todas las páginas.']]],
+['Ajustar área',[['🔍','Escala','Reduce el contenido para que quepa en 1 página de ancho o alto.']]],
+['Opciones de la hoja',[['▦','Líneas de cuadrícula','Ver o imprimir las líneas de las celdas.','Por defecto se ven, pero no se imprimen'],['🔡','Encabezados','Ver o imprimir letras de columnas y números de filas.']]],
+['Organizar',[['🧱','Organizar objetos','Traer al frente, enviar al fondo, alinear o agrupar imágenes y formas.','','Organizar']]]],
+Fórmulas:[['⭐ Operaciones básicas',[['＝','Empezar una fórmula','Toda fórmula empieza con el signo =. Después van números, direcciones de celda y operadores.','Ejemplo: =B2+C2','Empezar'],['➕','Sumar','Con el operador + o con la función SUMA (mejor para rangos).','=B2+C2   o   =SUMA(B2:C2)'],['➖','Restar','Con el operador - (guion). Excel no tiene función RESTA.','=B2-C2'],['✖️','Multiplicar','Con el operador * (asterisco) o con la función PRODUCTO.','=B2*C2   o   =PRODUCTO(B2:C2)'],['➗','Dividir','Con el operador / (diagonal). Si el divisor es 0 sale el error #¡DIV/0!','=B2/C2'],['🧠','Orden de operaciones','Primero paréntesis, luego * y /, al final + y -.','=(B2+C2)/2 es el promedio de dos notas','Orden']]],
+['Biblioteca de funciones',[['ƒx','Insertar función','Asistente para buscar y usar una función.','Atajo: Mayús+F3'],['Σ','Autosuma','Suma rápida de un rango.','Atajo: Alt+='],['🕘','Usadas recientemente','Lista de las últimas funciones que usaste.','','Recientes'],['💰','Financiera','Préstamos, pagos e inversiones (PAGO, VF).'],['❓','Lógicas','Decisiones con SI, Y, O.','=SI(D2>=6,"Aprobado","Reprobado")'],['🔠','Texto','Manipula texto: CONCATENAR, MAYUSC, IZQUIERDA.'],['📅','Fecha y hora','HOY, AHORA, AÑO, MES…'],['🔎','Búsqueda y referencia','Busca datos en tablas: BUSCARV, INDICE.','','Búsqueda'],['🔢','Matemáticas y trigonométricas','SUMA, REDONDEAR, POTENCIA, ENTERO…','','Matemáticas'],['⋯','Más funciones','Estadísticas (PROMEDIO, MAX, MIN, CONTAR), ingeniería, información…','','Más']]],
+['Nombres definidos',[['🏷️','Administrador de nombres','Crea y edita nombres para celdas o rangos.','Ejemplo: llamar Notas a B2:B5','Nombres']]],
+['Auditoría de fórmulas',[['➡️','Rastrear precedentes','Flechas hacia las celdas que alimentan la fórmula.','','Precedentes'],['👁️','Mostrar fórmulas','Muestra las fórmulas en lugar de los resultados.'],['⚠️','Comprobación de errores','Busca y explica errores como #¡DIV/0! o #NOMBRE?','','Errores'],['🔬','Evaluar fórmula','Resuelve la fórmula paso a paso.','','Evaluar']]],
+['Cálculo',[['⚙️','Opciones para el cálculo','Calcular de forma automática o manual.','Mejor dejarlo en Automático','Opciones'],['🔁','Calcular ahora','Recalcula todo si está en manual.','Tecla F9']]]],
+Datos:[['Obtener datos externos',[['🌐','Desde web','Trae una tabla de una página de internet.'],['📃','Desde texto','Importa archivos .txt o .csv.'],['🗄️','Desde Access','Importa tablas de una base de datos Access.']]],
+['Conexiones',[['🔄','Actualizar todo','Refresca los datos traídos de fuentes externas.','','Actualizar']]],
+['Ordenar y filtrar',[['🔼','Ordenar de A a Z','Ordena alfabéticamente o de menor a mayor.','','A a Z'],['🔽','Ordenar de Z a A','Ordena de mayor a menor.','','Z a A'],['⚙️','Ordenar','Ordena por varios criterios (grupo, luego nombre).'],['🔻','Filtro','Muestra solo las filas que cumplen un criterio.','Atajo: Ctrl+Mayús+L'],['🧹','Borrar','Quita los filtros y deja ver todo.'],['🔬','Avanzadas','Filtros con condiciones complejas.']]],
+['Herramientas de datos',[['⫼','Texto en columnas','Separa el contenido de una celda en varias columnas.','Ejemplo: Ana Pérez → Ana | Pérez','Texto en col.'],['⚡','Relleno rápido','Detecta un patrón y completa el resto.','Atajo: Ctrl+E'],['♻️','Quitar duplicados','Elimina filas repetidas.','','Duplicados'],['✅','Validación de datos','Limita lo que se puede escribir en una celda.','Ejemplo: solo calificaciones de 0 a 10','Validación'],['🔀','Consolidar','Une datos de varios rangos u hojas en uno.'],['🤔','Análisis de hipótesis','Prueba escenarios: Buscar objetivo, tablas de datos.','','Hipótesis']]],
+['Esquema',[['📚','Agrupar','Agrupa filas o columnas para poder contraerlas.'],['Σ','Subtotal','Inserta subtotales automáticos por grupo.']]]],
+Revisar:[['Revisión',[['ABC','Ortografía','Revisa errores de ortografía.','Tecla F7'],['📖','Referencia','Abre un panel de consulta.'],['🔁','Sinónimos','Sugiere palabras de significado parecido.']]],
+['Accesibilidad',[['♿','Comprobar accesibilidad','Busca problemas que dificulten leer el libro a personas con discapacidad.','','Accesibilidad']]],
+['Idioma',[['🌍','Traducir','Traduce el texto seleccionado.']]],
+['Comentarios',[['💬','Nuevo comentario','Agrega una nota a una celda.','Atajo: Mayús+F2','Nuevo'],['🗑️','Eliminar','Borra el comentario.'],['◀▶','Anterior y siguiente','Recorre los comentarios.','','Ant. / Sig.'],['👁️','Mostrar todos los comentarios','Los deja visibles en la hoja.','','Mostrar todos']]],
+['Cambios',[['🔒','Proteger hoja','Evita cambios en las celdas, con contraseña opcional.'],['🔐','Proteger libro','Evita agregar, borrar u ocultar hojas.'],['👥','Compartir libro','Permite que varias personas editen el archivo.'],['📝','Control de cambios','Registra quién cambió qué.','','Cambios']]]],
+Vista:[['Vistas de libro',[['▭','Normal','La vista de siempre.'],['⬓','Ver salto de página','Muestra dónde se cortará cada página al imprimir.','','Salto pág.'],['📄','Diseño de página','La hoja como saldrá impresa, con márgenes.','','Diseño pág.']]],
+['Mostrar',[['📐','Regla','Muestra reglas en la vista Diseño de página.'],['▦','Líneas de cuadrícula','Muestra u oculta las líneas.','','Cuadrícula'],['✏️','Barra de fórmulas','Muestra u oculta la barra de fórmulas.','','B. fórmulas'],['🔡','Encabezados','Muestra u oculta letras y números.']]],
+['Zoom',[['🔎','Zoom','Elige el porcentaje de acercamiento.'],['100','100%','Regresa al tamaño normal.'],['⤢','Ampliar selección','Acerca para que el rango seleccionado llene la ventana.','','Ampliar sel.']]],
+['Ventana',[['🪟','Nueva ventana','Abre el mismo libro en otra ventana.'],['▥','Organizar todo','Acomoda las ventanas abiertas.'],['🧊','Inmovilizar paneles','Deja fijas filas o columnas al desplazarte.','Útil para dejar visibles los encabezados','Inmovilizar'],['✂️','Dividir','Divide la hoja en secciones desplazables.'],['🙈','Ocultar','Esconde la ventana actual.']]],
+['Macros',[['⏺','Macros','Graba y ejecuta pasos automáticos.']]]]};
+const RIB={Inicio:ribbon};for(const t in MORE)RIB[t]=build(t,MORE[t]);
+const R=[['Alumno','Parcial 1','Parcial 2','Promedio','Suma','Resta','Producto','División'],['Ana',8,9,['8.5','=PROMEDIO(B2:C2)'],['17','=B2+C2'],['-1','=B2-C2'],['72','=B2*C2'],['0.89','=B2/C2']],['Luis',7,6,['6.5','=PROMEDIO(B3:C3)'],['13','=B3+C3'],['1','=B3-C3'],['42','=B3*C3'],['1.17','=B3/C3']],['María',10,9,['9.5','=PROMEDIO(B4:C4)'],['19','=B4+C4'],['1','=B4-C4'],['90','=B4*C4'],['1.11','=B4/C4']],['Pedro',6,8,['7','=PROMEDIO(B5:C5)'],['14','=B5+C5'],['-2','=B5-C5'],['48','=B5*C5'],['0.75','=B5/C5']],[],[],[]];
+const C='ABCDEFGH'.split('');
+let grid='<table><tr><th class="r" data-k="colh"></th>'+C.map(c=>'<th data-k="colh">'+c+'</th>').join('')+'</tr>';
+R.forEach((r,i)=>{grid+='<tr><th class="r" data-k="rowh">'+(i+1)+'</th>'+C.map((c,j)=>{const v=r[j],a=Array.isArray(v),num=typeof v=='number'||a;return '<td data-k="cell" data-a="'+c+(i+1)+'" data-f="'+(a?v[1]:(v===undefined?'':v))+'" data-fx="'+(a?1:0)+'"'+(num?' class="n"':'')+'>'+(a?v[0]:(v===undefined?'':v))+'</td>'}).join('')+'</tr>'});
+grid+='</table>';
+const B=(k,t,c)=>'<button data-k="'+k+'"'+(c?' class="'+c+'"':'')+'>'+t+'</button>';
+document.getElementById('app').innerHTML=
+'<div class="bar">'+B('save','💾')+B('undo','↶')+B('redo','↷')+B('title','Libro1 - Excel')+B('search','💡 Dime qué desea hacer…','srch')+'</div>'+
+'<div class="tabs">'+TABS.map(t=>'<button data-k="tab-'+t[0]+'" data-t="'+t[0]+'">'+t[0]+'</button>').join('')+'</div>'+
+'<div class="rib" id="rib"></div>'+
+'<div class="fb">'+B('namebox','A1','nb" id="nb')+B('fx','ƒx')+B('fbar','Alumno','fi" id="fi')+'</div>'+
+'<div class="gw">'+grid+'</div>'+
+'<div class="sb">'+B('sheet','Hoja1','sh')+B('addsheet','⊕')+'<span class="sp"></span>'+B('status','Listo')+B('views','▤ ▥ ▦')+B('zoom','– 100% +')+'</div>';
+const P={i:pi,l:pl,w:pw,d:pd,t:pt};
+function show(k,lab){const d=D[k];if(!d)return;P.i.innerHTML=d.i;P.l.textContent=lab||d.l;P.w.textContent='📍 '+d.w;P.d.textContent=d.d;P.t.style.display=d.t?'':'none';P.t.textContent='💡 '+(d.t||'')}
+function setTab(name){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==name));
+rib.innerHTML=RIB[name]}
+setTab('Inicio');
+document.querySelector('td').classList.add('cs');
+document.getElementById('app').addEventListener('click',e=>{const el=e.target.closest('[data-k]');if(!el)return;
+if(el.dataset.t&&el.dataset.t!='Archivo')setTab(el.dataset.t);
+document.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));
+if(el.dataset.k=='cell'){document.querySelectorAll('td.cs').forEach(x=>x.classList.remove('cs'));el.classList.add('cs');nb.textContent=el.dataset.a;fi.textContent=el.dataset.f;
+D.cell={w:'Cuadrícula de la hoja',i:'▭',l:'Celda '+el.dataset.a,d:'Unidad básica de la hoja: el cruce de una columna y una fila. Aquí escribes datos, texto o fórmulas.',t:el.dataset.fx=='1'?'Esta celda tiene una fórmula: mira la barra de fórmulas.':'Mira cómo cambian el Cuadro de nombres y la barra de fórmulas.'};}
+else if(!el.dataset.t)el.classList.add('sel');
+show(el.dataset.k)});
+</script></body></html>
